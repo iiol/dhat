@@ -12,15 +12,15 @@ int main(void)
 	strcpy(str, "Hello World");
 
 	ht = dhat_new(10);
-	dhat_add(ht, "100", &i);
-	dhat_add(ht, "1000", str);
+	dhat_put(ht, "100", &i);
+	dhat_put(ht, "1000", str);
 
-	if (dhat_getdata(ht, "100", (const void **) &i2))
+	if (dhat_get(ht, "100", (const void **) &i2))
 		printf("int: %d\n", *i2);
 	else
 		printf("Данные не найдены.\n");
 
-	if (dhat_getdata(ht, "1000", (const void **) &str2))
+	if (dhat_get(ht, "1000", (const void **) &str2))
 		printf("str: %s\n", str);
 	else
 		printf("Данные не найдены.\n");

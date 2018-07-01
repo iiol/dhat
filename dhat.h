@@ -17,7 +17,10 @@ typedef struct {
 } *dhat;
 
 dhat dhat_new(unsigned int size);
-int dhat_add(dhat dhat, char *key, const void *value);
-int dhat_getdata(dhat dhat, char *key, const void **data);
+void dhat_put(dhat dhat, char *key, const void *value);
+int dhat_get(dhat dhat, char *key, const void **data);
+// dhat_remove
+// dhat_clear
+
 
 #endif //_DHAT_N

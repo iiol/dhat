@@ -71,7 +71,7 @@ dhat dhat_new(unsigned int size)
 	return ht;
 }
 
-int dhat_add(dhat dhat, char *key, const void *value)
+void dhat_put(dhat dhat, char *key, const void *value)
 {
 	struct entry *head;
 	unsigned int hash;
@@ -97,11 +97,9 @@ int dhat_add(dhat dhat, char *key, const void *value)
 	head->key = xmalloc(strlen(key) + 1);
 	strcpy(head->key, key);
 	head->value = value;
-
-	return 0;
 }
 
-int dhat_getdata(dhat dhat, char *key, const void **data)
+int dhat_get(dhat dhat, char *key, const void **data)
 {
 	struct entry *head;
 
