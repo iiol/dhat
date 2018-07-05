@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <errno.h>
 
 #include "dhat.h"
@@ -56,12 +59,32 @@ static unsigned int gethash(const char *s, unsigned int size)
 	return hash % size;
 }
 
-dhat dhat_new(unsigned int size)
+static dhat dhat_resize(dhat ht) {
+	int i;
+	struct entry *head;
+	dhat newht;
+
+	newht = dhat_new(2 * ht->size, ht->maxdepth);
+
+	for (i = 0; i < ht->size; ++i) {
+		head = ht->entry[i];
+
+		for (; head != NULL; head = head->next)
+			newht = dhat_put(newht, head->key, head->value);
+	}
+
+	dhat_clear(ht);
+
+	return newht;
+}
+
+dhat dhat_new(unsigned int size, int depth)
 {
 	dhat ht;
 
 	ht = xmalloc(sizeof(dhat));
 	ht->size = size;
+	ht->maxdepth = depth;
 
 	size *= sizeof (struct entry *);
 
@@ -71,47 +94,91 @@ dhat dhat_new(unsigned int size)
 	return ht;
 }
 
-void dhat_put(dhat dhat, char *key, const void *value)
+dhat dhat_put(dhat ht, char *key, const void *value)
 {
+	int i;
 	struct entry *head;
 	unsigned int hash;
 
-	hash = gethash(key, dhat->size);
+	hash = gethash(key, ht->size);
 
-	head = dhat->entry[hash];
+	head = ht->entry[hash];
 
-	for (;; head = head->next) {
+	for (i = 1;; head = head->next, ++i) {
 		if (head == NULL) {
-			head = dhat->entry[hash] = ealloc();
+			head = ht->entry[hash] = ealloc();
 
 			break;
 		}
+		else if (strcmp(head->key, key) == 0)
+			break;
 		else if (head->next == NULL) {
-			head->next = ealloc();
-			head = head->next;
+			head = head->next = ealloc();
+			++i;
 
 			break;
 		}
 	}
 
-	head->key = xmalloc(strlen(key) + 1);
+	head->key = xrealloc(head->key, strlen(key) + 1);
 	strcpy(head->key, key);
 	head->value = value;
+
+	if (ht->maxdepth < i)
+		ht = dhat_resize(ht);
+
+	return ht;
 }
 
-int dhat_get(dhat dhat, char *key, const void **data)
+int dhat_get(dhat ht, char *key, const void **value)
 {
 	struct entry *head;
 
-	head = *(dhat->entry + gethash(key, dhat->size));
+	head = *(ht->entry + gethash(key, ht->size));
 
 	for (; head != NULL; head = head->next) {
 		if (strcmp(head->key, key) == 0) {
-			*data = head->value;
+			*value = head->value;
 
 			return 1;
 		}
 	}
 
 	return 0;
+}
+
+void dhat_remove(dhat ht, char *key)
+{
+	unsigned int hash;
+	struct entry *head, **phead;
+
+	hash = gethash(key, ht->size);
+	head = ht->entry[hash];
+	phead = ht->entry + hash;
+
+	for (; head != NULL; phead = &head->next, head = head->next) {
+		if (strcmp(key, head->key) == 0) {
+			*phead = head->next;
+			free(head->key);
+			free(head);
+		}
+	}
+}
+
+void dhat_clear(dhat ht)
+{
+	int i;
+	struct entry *head, *next;
+
+	for (i = 0; i < ht->size; ++i) {
+		head = ht->entry[i];
+
+		for (; head != NULL; head = next) {
+			next = head->next;
+
+			dhat_remove(ht, head->key);
+		}
+	}
+
+	free(ht);
 }

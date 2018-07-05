@@ -1,27 +1,25 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "dhat.h"
 
 int main(void)
 {
 	dhat ht;
-	char *str, *str2;
-	int i = 500, *i2;
+	char *strs[] = {"str0", "str1", "str2", "str3", "str4", "str5", "str6"};
+	char *str;
 
-	str = malloc(100);
-	strcpy(str, "Hello World");
+	ht = dhat_new(2, 2);
 
-	ht = dhat_new(10);
-	dhat_put(ht, "100", &i);
-	dhat_put(ht, "1000", str);
+	ht = dhat_put(ht, "0", strs[0]);
+	ht = dhat_put(ht, "1", strs[1]);
+	ht = dhat_put(ht, "2", strs[2]);
+	ht = dhat_put(ht, "3", strs[3]);
+	ht = dhat_put(ht, "4", strs[4]);
+	ht = dhat_put(ht, "5", strs[5]);
+	ht = dhat_put(ht, "6", strs[6]);
 
-	if (dhat_get(ht, "100", (const void **) &i2))
-		printf("int: %d\n", *i2);
-	else
-		printf("Данные не найдены.\n");
-
-	if (dhat_get(ht, "1000", (const void **) &str2))
-		printf("str: %s\n", str);
-	else
-		printf("Данные не найдены.\n");
+	if (dhat_get(ht, "6", (const void **) &str))
+		printf("%s\n", str);
 }
