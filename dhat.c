@@ -64,7 +64,7 @@ static dhat dhat_resize(dhat ht) {
 	struct entry *head;
 	dhat newht;
 
-	newht = dhat_new(2 * ht->size, ht->maxdepth);
+	newht = dhat_new(ht->factor * ht->size, ht->maxdepth, ht->factor);
 
 	for (i = 0; i < ht->size; ++i) {
 		head = ht->entry[i];
@@ -78,13 +78,14 @@ static dhat dhat_resize(dhat ht) {
 	return newht;
 }
 
-dhat dhat_new(unsigned int size, int depth)
+dhat dhat_new(unsigned int size, int depth, int factor)
 {
 	dhat ht;
 
 	ht = xmalloc(sizeof(dhat));
 	ht->size = size;
 	ht->maxdepth = depth;
+	ht->factor = factor;
 
 	size *= sizeof (struct entry *);
 

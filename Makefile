@@ -1,6 +1,8 @@
 CC = gcc
 CFLAGS = -Wall
 
+.PHONY: test
+
 all: dhat.o test
 
 dhat.o: dhat.c

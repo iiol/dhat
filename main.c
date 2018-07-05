@@ -10,7 +10,7 @@ int main(void)
 	char *strs[] = {"str0", "str1", "str2", "str3", "str4", "str5", "str6"};
 	char *str;
 
-	ht = dhat_new(2, 2);
+	ht = dhat_new(2, 2, 2);
 
 	ht = dhat_put(ht, "0", strs[0]);
 	ht = dhat_put(ht, "1", strs[1]);
